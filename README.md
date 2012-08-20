@@ -4,7 +4,7 @@ TODO: Write a gem description
 
 ## Installation
 
-    $ gem install plesk-ruby
+    $ gem install ruby-plesk
 
 ## Usage
 
