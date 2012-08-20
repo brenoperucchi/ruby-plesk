@@ -1,4 +1,4 @@
-require "plesk-ruby/version"
+require "ruby-plesk/version"
 
 require 'net/http'
 # require 'builder'

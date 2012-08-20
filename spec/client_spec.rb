@@ -1,5 +1,5 @@
 require "spec_helper"
-require_relative "../lib/plesk-ruby"
+require_relative "../lib/ruby-plesk"
 
 describe Plesk do
 
