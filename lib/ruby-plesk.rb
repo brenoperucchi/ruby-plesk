@@ -31,7 +31,7 @@ module Plesk
       else
         response.plesk_id = xml.root.elements['//id'].text if xml.root.elements['//id'].present?
       end
-      return response
+      response
     end
 
   end
@@ -42,39 +42,6 @@ module Plesk
     def initialize(host, user, pass, timeout = 5)
       @host, @user, @pass, @timeout = host, user, pass, timeout
     end
-
-    def add_domain(domain_name, ip_address, options = {})
-string = <<EOF
-<domain>
-  <add>
-    <gen_setup>
-      <name>#{domain_name}</name>
-      <owner-id>#{options[:owner_id]}</owner-id>
-      <ip_address>#{ip_address}</ip_address>
-    </gen_setup>
-    <template-id>#{options[:template_id]}</template-id>
-  </add>
-</domain>
-EOF
-
-      xml = REXML::Document.new(string)
-      rpc_version = "1.6.0.2"
-      begin
-        Timeout.timeout(timeout) { open(host) }
-      rescue Errno::ECONNREFUSED => e
-        raise Exception.new(e.message)
-      rescue SocketError => e
-        raise Exception.new(e.message)
-      rescue Timeout::Error => e
-        raise Exception.new(e.message)
-      end
-
-      @xml_response, @xml_target = remote_rpc(xml, rpc_version)
-      pleskresponse = Response.build_from_xml(@xml_response)
-
-      return pleskresponse
-    end
-
     def remote_rpc(xml2, rpc_version = @rpc_version)
       path = "/enterprise/control/agent.php"
 string = <<EOF
@@ -98,6 +65,39 @@ doc = REXML::Document.new(string)
     rescue SocketError
       raise Exception.new("Remote Protocol Comunnication Socket Error")
     end
+
+    def add_domain(domain_name, ip_address, options = {})
+string = <<EOF
+<domain>
+  <add>
+    <gen_setup>
+      <name>#{domain_name}</name>
+      <owner-id>#{options[:owner_id]}</owner-id>
+      <ip_address>#{ip_address}</ip_address>
+    </gen_setup>
+    <template-id>#{options[:template_id]}</template-id>
+  </add>
+</domain>
+EOF
+
+      xml = REXML::Document.new(string)
+      rpc_version = "1.6.0.2"
+      begin
+        # Timeout.timeout(timeout) { OpenURI.open_http(host) }
+      rescue Errno::ECONNREFUSED => e
+        raise Exception.new(e.message)
+      rescue SocketError => e
+        raise Exception.new(e.message)
+      rescue Timeout::Error => e
+        raise Exception.new(e.message)
+      end
+
+      @xml_response, @xml_target = remote_rpc(xml, rpc_version)
+      pleskresponse = Response.build_from_xml(@xml_response)
+
+      pleskresponse
+    end
+
 
     # def add_domain_rpc(domain_name, ip_address, owner_id ,template_id)
     #     xml = Builder::XmlMarkup.new
